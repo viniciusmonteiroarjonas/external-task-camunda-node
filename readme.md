@@ -1,5 +1,3 @@
-# Camunda
-
 # Introdução
 
 Projeto desenvolvido utilizando o camunda para modelar o fluxo de cadastro de usuário no sistema, enviando uma e-mail de boas vindas para ele como confirmação do cadastro.

@@ -1,6 +1,10 @@
 # Introdução
 
-Projeto desenvolvido utilizando o camunda para modelar o fluxo de cadastro de usuário no sistema, enviando uma e-mail de boas vindas para ele como confirmação do cadastro.
+Projeto desenvolvido utilizando o camunda para modelar o fluxo de consulta de um CEP, utilizamos um script task para setar uma varíavel contendo um CEP, e em seguida executamos a task service consulta-cep, para retornar um json de dados, que consumimos da API https://viacep.com.br, e posteriormente setamos uma variavel com os dados do endereço e na sequência salvamos na base de dados Mysql.
+
+# Modelagem do BPMN
+
+<img src="fluxo.png">
 
 # Instalação do camunda
 

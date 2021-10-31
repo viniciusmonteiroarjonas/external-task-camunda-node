@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1ps5wxj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="cadastro_cliente" name="cadastro_cliente" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_06aaewp" sourceRef="cadastro" targetRef="dados_cliente" />
+    <bpmn:sequenceFlow id="Flow_17cf58c" sourceRef="consulta-cep" targetRef="Activity_1xdrsro" />
+    <bpmn:serviceTask id="consulta-cep" name="Consulta CEP" camunda:type="external" camunda:topic="consulta-cep">
+      <bpmn:incoming>Flow_0e2570y</bpmn:incoming>
+      <bpmn:outgoing>Flow_17cf58c</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1xdrsro" name="Registra cliente no banco" camunda:type="external" camunda:topic="salva-dados-banco">
+      <bpmn:incoming>Flow_17cf58c</bpmn:incoming>
+      <bpmn:outgoing>Flow_1b4dud3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="cadastro" name="cadastro_cliente">
+      <bpmn:outgoing>Flow_06aaewp</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0n1wd2z" messageRef="Message_0sm647b" />
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_029i7nl" camunda:asyncBefore="true">
+      <bpmn:incoming>Flow_1772pgz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hpcf4u</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0e2570y</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1hpcf4u" name="CEP não informado" sourceRef="Gateway_029i7nl" targetRef="Activity_0rzihyh">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.hasVariable("cep") == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_0rzihyh" name="Processo Encerrado">
+      <bpmn:incoming>Flow_1hpcf4u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c0qj75</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1c0qj75" sourceRef="Activity_0rzihyh" targetRef="Event_1cl2eam" />
+    <bpmn:endEvent id="Event_1cl2eam">
+      <bpmn:incoming>Flow_1c0qj75</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_06icmtg" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0e9mhpy" sourceRef="dados_cliente" targetRef="cep_cliente" />
+    <bpmn:userTask id="dados_cliente" name="Informa dados cliente">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="nome" label="nome" type="string" />
+          <camunda:formField id="email" label="email" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06aaewp</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e9mhpy</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1772pgz" sourceRef="cep_cliente" targetRef="Gateway_029i7nl" />
+    <bpmn:sequenceFlow id="Flow_0e2570y" sourceRef="Gateway_029i7nl" targetRef="consulta-cep" />
+    <bpmn:endEvent id="Event_0m61alz">
+      <bpmn:incoming>Flow_17q7lwv</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0fj81u0" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1b4dud3" sourceRef="Activity_1xdrsro" targetRef="Activity_0y0zcat" />
+    <bpmn:userTask id="Activity_0y0zcat" name="Finish">
+      <bpmn:incoming>Flow_1b4dud3</bpmn:incoming>
+      <bpmn:outgoing>Flow_17q7lwv</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_17q7lwv" sourceRef="Activity_0y0zcat" targetRef="Event_0m61alz" />
+    <bpmn:userTask id="cep_cliente" name="Informa CEP">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript" />
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0e9mhpy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1772pgz</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmn:message id="Message_0sm647b" name="cadastro_cliente" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="cadastro_cliente">
+      <bpmndi:BPMNEdge id="Flow_17q7lwv_di" bpmnElement="Flow_17q7lwv">
+        <di:waypoint x="1230" y="117" />
+        <di:waypoint x="1282" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b4dud3_di" bpmnElement="Flow_1b4dud3">
+        <di:waypoint x="1070" y="117" />
+        <di:waypoint x="1130" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e2570y_di" bpmnElement="Flow_0e2570y">
+        <di:waypoint x="735" y="117" />
+        <di:waypoint x="800" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1772pgz_di" bpmnElement="Flow_1772pgz">
+        <di:waypoint x="600" y="117" />
+        <di:waypoint x="685" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e9mhpy_di" bpmnElement="Flow_0e9mhpy">
+        <di:waypoint x="410" y="117" />
+        <di:waypoint x="500" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c0qj75_di" bpmnElement="Flow_1c0qj75">
+        <di:waypoint x="760" y="330" />
+        <di:waypoint x="812" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hpcf4u_di" bpmnElement="Flow_1hpcf4u" bioc:stroke="#000" bioc:fill="#fff">
+        <di:waypoint x="710" y="142" />
+        <di:waypoint x="710" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="645" y="213" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17cf58c_di" bpmnElement="Flow_17cf58c">
+        <di:waypoint x="900" y="117" />
+        <di:waypoint x="970" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06aaewp_di" bpmnElement="Flow_06aaewp">
+        <di:waypoint x="218" y="117" />
+        <di:waypoint x="310" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0vvdd5t_di" bpmnElement="consulta-cep">
+        <dc:Bounds x="800" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0em6qte_di" bpmnElement="Activity_1xdrsro">
+        <dc:Bounds x="970" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1g00pfz_di" bpmnElement="cadastro" bioc:stroke="#000" bioc:fill="#fff">
+        <dc:Bounds x="182" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="163" y="142" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_029i7nl_di" bpmnElement="Gateway_029i7nl" isMarkerVisible="true">
+        <dc:Bounds x="685" y="92" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0afo4kc_di" bpmnElement="Activity_0rzihyh">
+        <dc:Bounds x="660" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fbbuue_di" bpmnElement="Event_1cl2eam">
+        <dc:Bounds x="812" y="312" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1pzmmq0_di" bpmnElement="dados_cliente">
+        <dc:Bounds x="310" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0vz3g14_di" bpmnElement="Event_0m61alz">
+        <dc:Bounds x="1282" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yx8nk1_di" bpmnElement="Activity_0y0zcat">
+        <dc:Bounds x="1130" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qqa2cu_di" bpmnElement="cep_cliente">
+        <dc:Bounds x="500" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
